@@ -5,7 +5,7 @@
 </div>
 
 <h4 align="center">
-Yizi Chen, Sidi Wu, Tianyi Xiao, Nina Wiedemann, Loic Landrieu
+Yizi Chen*, Sidi Wu*, Tianyi Xiao, Nina Wiedemann, Loic Landrieu
 </h4>
 
 ## Description
@@ -20,6 +20,26 @@ We introduce Sketch2Shape model:
 <img src="media/pipeline.png" width="800"/>
 </p>
 
+### Project Structure
+
+Structure of this repository:
+
+```
+|
+├── dataloader                   <- Data loader
+├── config                       <- Model configurations
+├── eval                         <- Evaluation code  
+├── data                         <- Dataset for training
+│   ├── VRSketch2Shape           <- VRSketch2Shape dataset
+├── models                       <- Model
+│   ├── base_model.py            <- Base model
+|   ├── sketch2shape_model.py    <- VRSketch2Shape model
+├── environment.yml              <- Conda environment .yml file
+├── utils                        <- Some useful functions
+├── infer.py                     <- Inference and evaluation code for VRSketch2Shape
+└── README.md
+```
+
 ## Installation
 
 ### 1. Create and activate conda environment
@@ -28,7 +48,7 @@ conda env create -f environment.yml
 conda activate sketch2shape
 ```
 
-### 2. Download datasets
+### 2. Download datasets from huggingface repo
 
 Coming soon...
 
