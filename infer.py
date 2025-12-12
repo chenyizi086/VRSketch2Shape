@@ -92,13 +92,17 @@ def train():
 
     # Load the model
     model_path = args.model_path
-    model.load_ckpt(model_path)
+    if model_path is not None:
+        model.load_ckpt(model_path)
+        cprint(f"[*] Model has been loaded: {model_path}", 'blue')
+    else:
+        raise ValueError("model_path is None, please provide --model_path")
     cprint("[*] Model has been loaded: %s" % model_path, 'blue')
 
-    print('using real sketch data')
+    print(f'using {data_type} sketch data')
 
     tes_dl = Sketch2ShapeDataset(res=64, obj_idx=obj_idx, sdf_path=sdf_path, sketch_path=sketch_path, latent_z_path=latent_z_path, seq_len=seq_len, mask_per=mask_per, data_type=data_type)
-    test_dataloader = DataLoader(tes_dl, batch_size=args.batch_size, shuffle=False, num_workers=2, pin_memory=True, persistent_workers=True, drop_last=False)
+    test_dataloader = DataLoader(tes_dl, batch_size=args.batch_size, shuffle=False, num_workers=2, pin_memory=True, drop_last=False)
     
     save_path = os.path.join(Path(visualizer.img_dir).parent, 'visualization_3D')
     if not os.path.exists(save_path):
@@ -130,8 +134,8 @@ def train():
         pointcloud_gt  = sample_points_from_meshes(obj_gt, num_samples)
 
         # Chamfer distance
-        normal_pointcloud_gen = normalize_to_box(pointcloud_gen)[0]
-        normal_pointcloud_gt = normalize_to_box(pointcloud_gt)[0]
+        normal_pointcloud_gen, _ = normalize_to_box(pointcloud_gen)
+        normal_pointcloud_gt, _ = normalize_to_box(pointcloud_gt)
 
         cd_dist = chamfer_distance(normal_pointcloud_gen, normal_pointcloud_gt, batch_reduction=None)[0]
         chamfer_distance_list.append(cd_dist.mean().item())
