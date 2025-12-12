@@ -47,7 +47,7 @@ def parse_args():
 def train():
     # Create the dataloader
     obj_idx = ['02691156', '02933112', '03001627', '04379243']
-    data_dir = '/mnt/d/sdfusion/sketch3D_final'
+    data_dir = '' # add your data directory here
     sdf_path = os.path.join(data_dir, 'data/sdf')
     sketch_path = os.path.join(data_dir, 'data')
     latent_z_path = os.path.join(data_dir, 'data/z_code_0.2')
