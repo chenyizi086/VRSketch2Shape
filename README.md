@@ -17,7 +17,7 @@ We introduce Sketch2Shape model:
 - An order-aware sketch encoder coupled with a diffusion-based 3D generator
 
 <p align="center">
-<img src="media/pipeline.png" width="800"/>
+<img src="media/pipeline.png" style="width:70%; max-width:900px;"/>
 </p>
 
 ### Project Structure
@@ -35,6 +35,7 @@ Structure of this repository:
 │   ├── base_model.py            <- Base model
 |   ├── sketch2shape_model.py    <- VRSketch2Shape model
 ├── environment.yml              <- Conda environment .yml file
+├── scripts                      <- Scripts for running the experiments
 ├── utils                        <- Some useful functions
 ├── infer.py                     <- Inference and evaluation code for VRSketch2Shape
 └── README.md
@@ -76,7 +77,31 @@ sh scripts/run_infer.sh
 ```
 
 ### Qualitative results
+<p align="center">
+<img src="media/figure4.png" style="width:70%; max-width:900px;"/>
+</p>
 
+<p align="center" style="max-width:800px; margin:0 auto;">
+ &bull; Our approach generates shapes that are detailed, structurally accurate, and topologically faithful to the target geometry.
+</p>
+<div style="height:20px;"></div>
+
+<p align="center">
+<img src="media/unseen.png" style="width:70%; max-width:900px;"/>
+</p>
+
+<p align="center" style="max-width:800px; margin:0 auto;">
+ &bull; Results on sketches depicting object categories not present in the training data, including bottles, lamps, and cars from ShapeNet, and monitors, toilets, and beds from ModelNet. Despite the domain shift, our model generally produces plausible shapes aligned with the sketch intent.
+</p>
+<div style="height:20px;"></div>
+
+<p align="center">
+<img src="media/free_hand.png" style="width:50%; max-width:900px;"/>
+</p>
+
+<p align="center" style="max-width:800px; margin:0 auto;">
+ &bull;Our model generalizes well to free-hand sketches drawn without any reference shape for airplanes, chairs/sofas, tables, and cabinets, producing detailed and plausible reconstructions that reflect the user's intent.
+</p>
 
 ### Citation   
 
