@@ -49,8 +49,11 @@ conda activate sketch2shape
 ```
 
 ### 2. Download datasets from huggingface repo
-
-Coming soon...
+```
+pip install huggingface_hub
+huggingface-cli download YiziChen/VRSketch2Shape_dataset/blob/main/data.zip --local-dir .
+unzip data.zip
+```
 
 ### 3. Download weights from huggingface repo
 ```

@@ -47,10 +47,12 @@ def parse_args():
 def train():
     # Create the dataloader
     obj_idx = ['02691156', '02933112', '03001627', '04379243']
-    data_dir = '' # add your data directory here
-    sdf_path = os.path.join(data_dir, 'data/sdf')
-    sketch_path = os.path.join(data_dir, 'data')
-    latent_z_path = os.path.join(data_dir, 'data/z_code_0.2')
+
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    sketch_path = os.path.join(ROOT_DIR, 'data', 'sketch')
+    latent_z_path = os.path.join(ROOT_DIR, 'data', 'z_code_sdf')
+    sdf_path =  os.path.join(ROOT_DIR, 'data', 'sdf')
     args = parse_args()
 
     # fix seed
@@ -134,8 +136,8 @@ def train():
         pointcloud_gt  = sample_points_from_meshes(obj_gt, num_samples)
 
         # Chamfer distance
-        normal_pointcloud_gen, _ = normalize_to_box(pointcloud_gen)
-        normal_pointcloud_gt, _ = normalize_to_box(pointcloud_gt)
+        normal_pointcloud_gen = normalize_to_box(pointcloud_gen)[0]
+        normal_pointcloud_gt = normalize_to_box(pointcloud_gt)[0]
 
         cd_dist = chamfer_distance(normal_pointcloud_gen, normal_pointcloud_gt, batch_reduction=None)[0]
         chamfer_distance_list.append(cd_dist.mean().item())

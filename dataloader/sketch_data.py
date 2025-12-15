@@ -210,17 +210,16 @@ class Sketch2ShapeDataset(data.Dataset):
         self.sketch_path = sketch_path
         self.seq_len = seq_len
         self.latent_z_path = latent_z_path
-        self.sdf_path = sdf_path
         self.data_type = data_type
         self.mask_per = mask_per
+        self.sdf_path = sdf_path
         self.sketch_list = []
         self.pc_list = []
         self.sdf_list = []
 
         for idx in obj_idx:
-            self.sketch_path = os.path.join(sketch_path, 'HolmeSketcher', idx)
+            self.sketch_path = os.path.join(sketch_path, idx)
             self.latent_z_path = os.path.join(latent_z_path, idx)
-            self.sample_list = os.listdir(self.sketch_path)
             for i in os.listdir(os.path.join(self.sketch_path, 'test')):
                 try:
                     strokes = glob.glob(os.path.join(self.sketch_path, 'test', i, 'Detail_*', 'Strokes.curves'))[0]

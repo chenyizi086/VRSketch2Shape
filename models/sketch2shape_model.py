@@ -17,7 +17,7 @@ from models.base_model import BaseModel
 from models.networks.diffusion_networks.network import DiffusionUNet
 from models.model_utils import load_vqvae
 
-from utils.util_3d import init_mesh_renderer, render_sdf, init_points_renderer, render_pcd, sdf_to_mesh
+from utils.util_3d import init_mesh_renderer, render_sdf, init_points_renderer, render_pcd
 
 # ldm util
 from models.networks.diffusion_networks.ldm_diffusion_util import (
@@ -31,13 +31,11 @@ from models.networks.diffusion_networks.samplers.ddim import DDIMSampler
 from transformers import BertConfig
 
 import torch.nn as nn
-from transformers.models.bert.modeling_bert import BertEncoder, BertEmbeddings
+from transformers.models.bert.modeling_bert import BertEncoder
 from models.emb_fun import get_embedder
 import torch.nn.init as init
 import math
 from typing import Optional
-
-import pdb
 
 
 class PositionalEncoding(nn.Module):
@@ -61,7 +59,7 @@ class BertEmbeddings_sincos(nn.Module):
     """Construct the embeddings from word, position and token_type embeddings."""
     def __init__(self, config):
         super().__init__()
-        self.position_embeddings = PositionalEncoding(config.hidden_size, 300)  # relative point position from 0 to 100?
+        self.position_embeddings = PositionalEncoding(config.hidden_size, 300)  # relative point position from 0 to 300
         self.token_type_embeddings = PositionalEncoding(config.hidden_size, config.type_vocab_size) # stroke order from 0 to 300
 
         self.position_linear = nn.Linear(config.hidden_size, config.hidden_size) # project to hidden size
@@ -179,7 +177,7 @@ class SDFusionSketch2ShapeModel(BaseModel):
         self.model_name = self.name()
         self.device = 'cuda'
 
-        self.df_cfg = '../configs/sdfusion-sketchbert.yaml'
+        self.df_cfg = '../configs/sdfusion-sketch2shape.yaml'
         self.vq_cfg='../configs/vqvae_snet.yaml'
 
         ######## START: Define Networks ########
@@ -346,10 +344,6 @@ class SDFusionSketch2ShapeModel(BaseModel):
             self.x = self.x[:max_sample]
             self.sketch = self.sketch[:max_sample]
             self.uc_sketch = self.uc_sketch[:max_sample]
-
-        # vars_list = ['x']
-
-        # self.tocuda(var_names=vars_list)
 
     def switch_train(self):
         self.df.train()
