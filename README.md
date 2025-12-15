@@ -75,6 +75,9 @@ To test and evaluate the model, launch:
 sh scripts/run_infer.sh
 ```
 
+### Qualitative results
+
+
 ### Citation   
 
 If you use this method in your work, please cite our [paper](https://arxiv.org/pdf/2512.04761).

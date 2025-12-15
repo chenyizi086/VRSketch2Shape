@@ -44,7 +44,7 @@ def parse_args():
 
     return parser.parse_args()
 
-def train():
+def evaluate():
     # Create the dataloader
     obj_idx = ['02691156', '02933112', '03001627', '04379243']
 
@@ -152,4 +152,4 @@ def train():
     print('Average F-score: {}'.format(np.mean(F_score_list)))
 
 if __name__ == '__main__':
-    train()
+    evaluate()

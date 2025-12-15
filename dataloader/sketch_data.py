@@ -218,15 +218,15 @@ class Sketch2ShapeDataset(data.Dataset):
         self.sdf_list = []
 
         for idx in obj_idx:
-            self.sketch_path = os.path.join(sketch_path, idx)
-            self.latent_z_path = os.path.join(latent_z_path, idx)
-            for i in os.listdir(os.path.join(self.sketch_path, 'test')):
+            sketch_dir = os.path.join(sketch_path, idx)
+            latent_dir = os.path.join(latent_z_path, idx)
+            for i in os.listdir(os.path.join(sketch_dir, 'test')):
                 try:
-                    strokes = glob.glob(os.path.join(self.sketch_path, 'test', i, 'Detail_*', 'Strokes.curves'))[0]
+                    strokes = glob.glob(os.path.join(sketch_dir, 'test', i, 'Detail_*', 'Strokes.curves'))[0]
                 except IndexError:
                     strokes = None
 
-                latent_z = os.path.join(self.latent_z_path, i + '.npz')
+                latent_z = os.path.join(latent_dir, i + '.npz')
                 h5file = os.path.join(self.sdf_path, idx, i, 'ori_sample_grid.h5')
 
                 if os.path.exists(strokes) and os.path.exists(latent_z) and os.path.exists(h5file):
@@ -251,7 +251,7 @@ class Sketch2ShapeDataset(data.Dataset):
         line_seg = []
         with open(lerp_strokes, 'r') as file:
             for line in file:
-                if 'v' in line:
+                if line.startswith('v'):
                     lines.append(np.array(line_seg))
                     line_seg = []
                 else:

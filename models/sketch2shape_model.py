@@ -53,7 +53,7 @@ class PositionalEncoding(nn.Module):
         self.register_buffer('pe', pe.unsqueeze(0))  # shape (1, max_seq_length, d_model)
 
     def forward(self, x):
-        return self.pe[:, x].squeeze(0)
+        return self.pe[0, x]
 
 class BertEmbeddings_sincos(nn.Module):
     """Construct the embeddings from word, position and token_type embeddings."""
@@ -175,7 +175,7 @@ class SDFusionSketch2ShapeModel(BaseModel):
         self.isTrain = True
 
         self.model_name = self.name()
-        self.device = 'cuda'
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         self.df_cfg = '../configs/sdfusion-sketch2shape.yaml'
         self.vq_cfg='../configs/vqvae_snet.yaml'
@@ -437,7 +437,7 @@ class SDFusionSketch2ShapeModel(BaseModel):
     def forward(self):
         self.switch_train()
 
-        outputs = self.cond_model(self.sketch) # B, 15000, 1088
+        outputs = self.cond_model(self.sketch)
         c_sketch = outputs.last_hidden_state  # shape: (batch_size, hidden_dim)
 
         z = self.z
@@ -599,14 +599,14 @@ class SDFusionSketch2ShapeModel(BaseModel):
     @staticmethod
     def remove_module_prefix(state_dict):
         new_state_dict = {}
-        for key in state_dict.keys():  # key 比如 'vqvae', 'sketch_encoder', ...
+        for key in state_dict.keys():  # key such as 'vqvae', 'sketch_encoder', ...
             if key == 'global_step':
                 continue
             sub_dict = state_dict[key]
             new_sub_dict = {}
             for k, v in sub_dict.items():
                 if k.startswith('module.'):
-                    new_sub_dict[k[7:]] = v  # 去掉 'module.'
+                    new_sub_dict[k[7:]] = v  # remove 'module.'
                 else:
                     new_sub_dict[k] = v
             new_state_dict[key] = new_sub_dict
