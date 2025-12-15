@@ -103,46 +103,6 @@ def save_mesh_as_gif(mesh_renderer, mesh, nrow=3, fps=450, out_name='1.gif'):
         for rot in rot_comb_img:
             writer.append_data(rot)
 
-####################################################################################
-def init_line_renderer(image_size=256, dist=1.7, elev=20, azim=20, camera='0', device='cuda:0', line_width=1.0):
-    """
-    初始化线段渲染器
-    """
-    R, T = look_at_view_transform(dist, elev, azim)
-    
-    if camera == '0':
-        camera_cls = FoVPerspectiveCameras
-    else:
-        camera_cls = FoVOrthographicCameras
-    
-    cameras = camera_cls(device=device, R=R, T=T)
-    
-    # 线段渲染的光栅化设置
-    raster_settings = RasterizationSettings(
-        image_size=image_size,
-        blur_radius=0.0,  # 无模糊以保持线段清晰
-        faces_per_pixel=1,
-        # perspective_correct=True,
-        # cull_backfaces=False,  # 不剔除背面以确保所有线段可见
-    )
-    
-    rasterizer = MeshRasterizer(
-        cameras=cameras,
-        raster_settings=raster_settings
-    )
-    
-    # 使用简单的flat shader
-    shader = HardFlatShader(
-        device=device,
-        cameras=cameras,
-    )
-    
-    renderer = MeshRenderer(
-        rasterizer=rasterizer,
-        shader=shader
-    )
-    
-    return renderer
 
 ############################# START: renderer #######################################
 def init_points_renderer(image_size=256, dist=1.7, elev=20, azim=20, camera='0', device='cuda:0'):
@@ -240,73 +200,6 @@ def init_mesh_renderer(image_size=512, dist=3.5, elev=90, azim=90, camera='0', d
         )
     return renderer
 
-############################# END: renderer #######################################
-
-# def normalize_vertices(pc):
-#     centroid = np.mean(pc, axis=0)
-#     pc = pc - centroid
-#     m = np.max(np.sqrt(np.sum(pc**2, axis=1)))
-#     pc = pc / m
-#     return pc
-
-
-# def sdf_to_mesh(sdf, level=0.02, color=None, render_all=False):
-#     device=sdf.device
-
-#     # extract meshes from sdf
-#     n_cell = sdf.shape[-1]
-#     bs, nc = sdf.shape[:2]
-
-#     assert nc == 1
-
-#     nimg_to_render = bs
-#     if not render_all:
-#         if bs > 16:
-#             cprint('Warning! Will not return all meshes', 'red')
-#         nimg_to_render = min(bs, 16) # no need to render that much..
-
-#     verts = []
-#     faces = []
-#     verts_rgb = []
-
-#     for i in range(nimg_to_render):
-#         sdf_i = sdf[i, 0].detach().cpu().numpy()
-#         # verts_i, faces_i = mcubes.marching_cubes(sdf_i, 0.02)
-#         verts_i, faces_i = mcubes.marching_cubes(sdf_i, level)
-#         # verts_i = verts_i / n_cell - .5
-
-#         verts_i = torch.from_numpy(verts_i).float().to(device)
-#         faces_i = torch.from_numpy(faces_i.astype(np.int64)).to(device)
-#         text_i = torch.ones_like(verts_i).to(device)
-#         if color is not None:
-#             for i in range(3):
-#                 text_i[:, i] = color[i]
-
-#         verts.append(verts_i)
-#         faces.append(faces_i)
-#         verts_rgb.append(text_i)
-
-#     try:
-#         # p3d_mesh = pytorch3d.structures.Meshes(verts, faces, textures=pytorch3d.renderer.Textures(verts_rgb=verts_rgb))
-#         # return with open3d mesh
-#         # Create Open3D TriangleMesh
-#         p3d_mesh = o3d.geometry.TriangleMesh()
-
-#         # Assign vertices and faces
-#         # vertices = verts[0].cpu().numpy()
-#         # vertices[:, 0] = -vertices[:, 0]  # Mirror y axis
-
-#         # faces = faces[0].cpu().numpy()
-#         p3d_mesh.vertices = o3d.utility.Vector3dVector(verts[0].cpu().numpy())
-#         p3d_mesh.triangles = o3d.utility.Vector3iVector(faces[0].cpu().numpy())
-
-#         # p3d_mesh.vertices = o3d.utility.Vector3dVector(vertices)
-#         # p3d_mesh.triangles = o3d.utility.Vector3iVector(faces)
-#     except:
-#         p3d_mesh = None
-
-#     return p3d_mesh
-
 def sdf_to_mesh(sdf, level=0.02, color=None, render_all=False, centroid=None, m=None):
     # device='cuda'
     device=sdf.device
@@ -401,64 +294,6 @@ def render_pcd(renderer, verts, color=[1, 1, 1], alpha=False):
     except:
         images = renderer(pcl, gamma=(1e-4,),)
         
-    return images.permute(0, 3, 1, 2)
-
-def render_lines(renderer, line_verts, line_edges, color=[1, 1, 1]):
-    """
-    渲染线段
-    
-    Args:
-        renderer: PyTorch3D renderer
-        line_verts: 顶点坐标, shape (B, V, 3) 或 (V, 3)
-        line_edges: 边的索引, shape (E, 2), 每行表示连接的两个顶点索引
-        color: RGB颜色
-    """
-    from pytorch3d.structures import Meshes
-    from pytorch3d.renderer import TexturesVertex
-    
-    if line_verts.dim() == 2:
-        line_verts = line_verts[None, ...]
-    
-    B = line_verts.shape[0]
-    device = renderer.rasterizer.cameras.device
-    line_verts = line_verts.to(device)
-    
-    # 为每条边创建退化的三角形
-    faces_list = []
-    verts_list = []
-    verts_rgb_list = []
-    
-    for b in range(B):
-        # 将边转换为三角形（每条边创建一个退化三角形）
-        # 注意：这里使用边作为面可能会导致问题，因为面需要3个顶点
-        # 我们需要创建退化三角形
-        num_edges = line_edges.shape[0]
-        faces = []
-        for edge in line_edges:
-            # 创建退化三角形：使用边的两个顶点加上第一个顶点重复
-            faces.append([edge[0], edge[1], edge[1]])  # 退化三角形
-        
-        faces = torch.tensor(faces, dtype=torch.long, device=device)
-        faces_list.append(faces)
-        verts_list.append(line_verts[b])
-        
-        # 创建顶点颜色
-        verts_rgb = torch.ones_like(line_verts[b])
-        for i in range(3):
-            verts_rgb[:, i] = color[i]
-        verts_rgb_list.append(verts_rgb)
-    
-    # 创建Meshes对象
-    meshes = Meshes(
-        verts=verts_list,
-        faces=faces_list
-    )
-    
-    # 设置顶点纹理
-    textures = TexturesVertex(verts_features=verts_rgb_list)
-    meshes.textures = textures
-    
-    images = renderer(meshes)
     return images.permute(0, 3, 1, 2)
 
 def render_mesh(renderer, mesh, color=None, norm=True):

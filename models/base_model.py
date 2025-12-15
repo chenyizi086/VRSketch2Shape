@@ -1,6 +1,19 @@
 import torch
-import utils.util as util
+import torchvision.utils as vutils
+import numpy as np
 
+
+def tensor2im(image_tensor, imtype=np.uint8):
+    n_img = min(image_tensor.shape[0], 16)
+    image_tensor = image_tensor[:n_img]
+
+    if image_tensor.shape[1] == 1:
+        image_tensor = image_tensor.repeat(1, 3, 1, 1)
+    image_tensor = vutils.make_grid( image_tensor, nrow=4 )
+
+    image_numpy = image_tensor.cpu().float().numpy()
+    image_numpy = ( np.transpose( image_numpy, (1, 2, 0) ) + 1) / 2.0 * 255.
+    return image_numpy.astype(imtype)
 
 # modified from https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
 class BaseModel():
@@ -100,5 +113,5 @@ class BaseModel():
         for name in tensor_names:
             if isinstance(name, str):
                 var = getattr(self, name)
-                ims.append(util.tensor2im(var.data))
+                ims.append(tensor2im(var.data))
         return ims

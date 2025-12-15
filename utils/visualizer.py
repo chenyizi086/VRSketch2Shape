@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 from termcolor import colored
-from . import util
+from PIL import Image
 
 from datetime import datetime
 
@@ -36,6 +36,20 @@ def parse_line(line):
 
     return info_d
 
+def mkdir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+def mkdirs(paths):
+    if isinstance(paths, list) and not isinstance(paths, str):
+        for path in paths:
+            mkdir(path)
+    else:
+        mkdir(paths)
+
+def save_image(image_numpy, image_path):
+    image_pil = Image.fromarray(image_numpy)
+    image_pil.save(image_path)
 
 class Visualizer():
     def __init__(self, isTrain=True, name=None, tag_name=None):
@@ -63,7 +77,7 @@ class Visualizer():
 
     def setup_io(self):
         print('[*] create image directory:\n%s...' % os.path.abspath(self.img_dir) )
-        util.mkdirs([self.img_dir])
+        mkdirs([self.img_dir])
 
         if self.isTrain:
             self.log_name = os.path.join(self.log_dir, 'loss_log.txt')
@@ -113,4 +127,4 @@ class Visualizer():
             else:
                 vis_all = np.concatenate([vis_all, image_numpy], axis=1)
 
-        util.save_image(vis_all, img_path)
+        save_image(vis_all, img_path)

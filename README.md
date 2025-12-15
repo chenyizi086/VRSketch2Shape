@@ -49,6 +49,7 @@ conda activate sketch2shape
 ```
 
 ### 2. Download datasets from huggingface repo
+At the moment, we only provide sketch shapes for model inference. The training sketch shapes will be released soon!
 ```
 pip install huggingface_hub
 huggingface-cli download YiziChen/VRSketch2Shape_dataset/blob/main/data.zip --local-dir .
@@ -65,7 +66,7 @@ huggingface-cli download YiziChen/sketch2model/df_epoch_best_multicls.pth --loca
 
 ### Training the model
 
-Coming soon...
+Coming soon!
 
 ### Testing the model
 
@@ -86,3 +87,10 @@ If you use this method in your work, please cite our [paper](https://arxiv.org/p
   year={2025},
 }
 ```
+
+## Acknowledgement
+We are thankful for the great open-source code of [SDFusion](https://github.com/yccyenchicheng/SDFusion).
+
+## Issues and FAQ
+
+Coming soon!
