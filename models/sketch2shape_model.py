@@ -89,6 +89,7 @@ class BertEmbeddings_sincos(nn.Module):
         embeddings = self.dropout(embeddings)
         return embeddings
 
+
 class BertTokenEncoder(nn.Module):
     def __init__(self, input_dim=5, hidden_dim=768, seq_len=300, nerf_L=8, masking=True, ordering=True, num_layer=2):
         super().__init__()
