@@ -108,11 +108,12 @@ sh scripts/run_infer.sh
 If you use this method in your work, please cite our [paper](https://arxiv.org/pdf/2512.04761).
 
 ```markdown
-@inproceedings{Chen2025OrderM3,
+@inproceedings{chen2026order,
   title={Order Matters: 3D Shape Generation from Sequential VR Sketches},
-  author={Yizi Chen and Sidi Wu and Tianyi Xiao and Nina Wiedemann and Loic Landrieu},
-  doi={10.48550/arXiv.2512.04761},
-  year={2025},
+  author={Chen, Yizi and Wu, Sidi and Xiao, Tianyi and Wiedemann, Nina and Landrieu, Loic},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={34259--34269},
+  year={2026}
 }
 ```
 
@@ -121,4 +122,4 @@ We are thankful for the great open-source code of [SDFusion](https://github.com/
 
 ## Issues and FAQ
 
-Coming soon!
+- Inference code and data are now publicly available!
